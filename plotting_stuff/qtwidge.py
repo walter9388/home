@@ -74,6 +74,38 @@ def run_dash(app):
     app.run_server(debug=False)
 
 
+def runpanelqt(pn):
+
+    from flask import Flask, render_template
+    from bokeh.embed import server_document
+    from bokeh.server.server import Server
+    from tornado.ioloop import IOLoop
+
+    # Flask setup
+    app = Flask(__name__)
+
+    def modify_doc(doc):
+        doc.add_root(pn.get_root(doc))
+
+    @app.route('/', methods=['GET'])
+    def bkapp_page():
+        script = server_document('http://localhost:5006/bkapp')
+        return render_template("embed.html", script=script, template="Flask")
+
+    def bk_worker():
+        # Can't pass num_procs > 1 in this configuration. If you need to run multiple
+        # processes, see e.g. flask_gunicorn_embed.py
+        server = Server({'/bkapp': modify_doc}, io_loop=IOLoop(), allow_websocket_origin=["127.0.0.1:8000"])
+        server.start()
+        server.io_loop.start()
+
+    from threading import Thread
+    Thread(target=bk_worker).start()
+
+    threading.Thread(target=run_bokeh, args=(app,), daemon=True).start()
+    Main('http://127.0.0.1:8000')
+
+
 if __name__ == '__main__':
     data = [
         {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'bar', 'name': 'SF'},
