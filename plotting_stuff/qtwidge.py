@@ -24,24 +24,25 @@ class Color(QWidget):
 
 class Main(QWidget):
 
-    def __init__(self):
+    def __init__(self,url):
         self.app = QApplication(sys.argv)
         super().__init__()
 
-        self.initUI()
+        self.initUI(url)
 
         self.show()
         sys.exit(self.app.exec())
 
-    def initUI(self):
+    def initUI(self,url):
         self.setWindowTitle(u'\u00A9Waldron2020')
         self.setWindowIcon(QIcon('test.png'))
         myappid = u'mycompany.myproduct.subproduct.version'  # arbitrary string
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
         self.web = QWebEngineView()
-        self.web.setUrl(QUrl("http://127.0.0.1:8050"))
+        # self.web.setUrl(QUrl("http://127.0.0.1:8050"))
         # self.web.setUrl(QUrl("https://google.com"))
+        self.web.setUrl(QUrl(url))
         self.web.setZoomFactor(2)
 
         self.lay = QVBoxLayout(self)
@@ -60,7 +61,14 @@ class Main(QWidget):
 
 def rundashqt(app):
     threading.Thread(target=run_dash, args=(app,), daemon=True).start()
-    Main()
+    Main('http://127.0.0.1:8050')
+
+def runbokehqt(app):
+    threading.Thread(target=run_bokeh, args=(app,), daemon=True).start()
+    Main('http://127.0.0.1:8000')
+
+def run_bokeh(app):
+    app.run(port=8000)
 
 def run_dash(app):
     app.run_server(debug=False)
