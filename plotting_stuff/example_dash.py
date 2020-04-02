@@ -4,8 +4,6 @@ import plotly.io as pio
 from copy import copy
 import numpy as np
 
-from plotting_stuff import qtwidge
-
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -122,5 +120,6 @@ def heroku_call():
     return app
 
 if __name__=='__main__':
+    from plotting_stuff import qtwidge
     qtwidge.rundashqt(app)
 
