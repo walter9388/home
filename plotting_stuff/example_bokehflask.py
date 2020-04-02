@@ -72,6 +72,9 @@ def bk_worker():
 from threading import Thread
 Thread(target=bk_worker).start()
 
+def heroku_call():
+    return app
+
 if __name__ == '__main__':
     print('Opening single process Flask app with embedded Bokeh application on http://localhost:8000/')
     print()
