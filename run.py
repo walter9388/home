@@ -20,14 +20,12 @@ from plotting_stuff import example_dash, example_panel, example_bokehflask
 
 # pn = example_panel.heruko_call()
 
-
-
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # qtwidge.run_dash(app)
     # app.run_server(debug=True)
 
-    pn = example_panel.heruko_call()
-    pn.servable()
+pan = example_panel.heruko_call()
+pan.servable()
     # app.run()
     # app.debug = True
     # def run_bokeh(app):
