@@ -18,7 +18,33 @@ from plotting_stuff import example_dash, example_panel, example_bokehflask
 # app.debug = True
 # app.run()
 
-pn = example_panel.heruko_call()
+# pn = example_panel.heruko_call()
+
+
+
+
+
+import panel as pn
+
+pn.extension('vega')
+
+
+#######
+
+
+import altair as alt
+from vega_datasets import data
+
+cars = data.cars()
+
+chart = alt.Chart(cars).mark_circle(size=60).encode(
+    x='Horsepower',
+    y='Miles_per_Gallon',
+    color='Origin',
+    tooltip=['Name', 'Origin', 'Horsepower', 'Miles_per_Gallon']
+).properties(width='container', height='container').interactive()
+
+altair_pane = pn.panel(chart)
 
 
 if __name__ == '__main__':
@@ -26,7 +52,7 @@ if __name__ == '__main__':
     # app.run_server(debug=True)
 
     # app.run()
-    pn.servable()
+    altair_pane.servable()
     # app.debug = True
     # def run_bokeh(app):
     #     app.run(port=8000)

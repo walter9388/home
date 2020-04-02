@@ -1,1 +1,1 @@
-web: panel serve --address="0.0.0.0" --port=$PORT --allow-websocket-origin=waldron-imperial.herokuapp.com --use-xheaders run.py
+web: panel serve --address="0.0.0.0" --port=$PORT run.py --allow-websocket-origin=waldron-imperial.herokuapp.com
