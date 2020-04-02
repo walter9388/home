@@ -197,7 +197,7 @@ mypanel=pn.Tabs(
 
 
 def heruko_call():
-    qtwidge.runpanelqt(mypanel)
+    return mypanel
 
 if __name__ == '__main__':
 

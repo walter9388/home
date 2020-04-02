@@ -10,6 +10,7 @@ from plotting_stuff import example_dash, example_panel, example_bokehflask
 # app = example_dash.heroku_call()
 app = example_bokehflask.heroku_call()
 
+app = heroku_dash_example.heroku_call()
 
 # get server
 # server = app.server # if dash
@@ -24,5 +25,10 @@ if __name__ == '__main__':
     # qtwidge.run_dash(app)
     # app.run_server(debug=True)
 
+    app.run(port=8000)
+
     # app.debug = True
-    app.run()
+    # def run_bokeh(app):
+    #     app.run(port=8000)
+    # import threading
+    # threading.Thread(target=run_bokeh, args=(app,), daemon=True).start()

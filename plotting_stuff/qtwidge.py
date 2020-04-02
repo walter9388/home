@@ -9,6 +9,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+from plotting_stuff import run_servers
 
 
 class Color(QWidget):
@@ -68,10 +69,12 @@ def runbokehqt(app):
     Main('http://127.0.0.1:8000')
 
 def run_bokeh(app):
-    app.run(port=8000)
+    # app.run(port=8000)
+    run_servers.run_bokeh(app)
 
 def run_dash(app):
-    app.run_server(debug=False)
+    # app.run_server(debug=False)
+    run_servers.run_dash(app)
 
 
 def runpanelqt(pn):
