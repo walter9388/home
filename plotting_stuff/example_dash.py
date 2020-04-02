@@ -118,4 +118,9 @@ app.layout = html.Div(children=[
     )
 ])
 
-qtwidge.rundashqt(app)
+def heroku_call():
+    qtwidge.run_dash(app)
+
+if __name__=='__main__':
+    qtwidge.rundashqt(app)
+
