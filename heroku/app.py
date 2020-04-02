@@ -25,5 +25,8 @@ app.layout = html.Div([
 def display_value(value):
     return 'You have selected "{}"'.format(value)
 
+def run_me():
+    app.run_server(debug=True)
+
 if __name__ == '__main__':
     app.run_server(debug=True)
