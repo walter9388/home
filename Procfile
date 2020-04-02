@@ -1,1 +1,1 @@
-web: gunicorn run_heroku:server
+web: gunicorn app:server
