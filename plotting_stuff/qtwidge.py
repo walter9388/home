@@ -1,9 +1,9 @@
 import sys
 import threading
-from PyQt5.QtCore import *
-from PyQt5.QtWebEngineWidgets import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PyQt5.QtCore import QUrl, QSize
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QSizePolicy
+from PyQt5.QtGui import QPalette, QColor, QIcon
 import ctypes
 import dash
 import dash_core_components as dcc
