@@ -4,5 +4,7 @@ from heroku import heroku_dash_example
 
 if __name__ == '__main__':
     # run file like so
-    heroku_dash_example.run_me()
+    app = heroku_dash_example.run_me()
     # example_dash.heroku_call()
+
+    app.run_server(debug=True)

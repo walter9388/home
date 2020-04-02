@@ -26,7 +26,7 @@ def display_value(value):
     return 'You have selected "{}"'.format(value)
 
 def run_me():
-    app.run_server(debug=True)
+    return app
 
 if __name__ == '__main__':
     app.run_server(debug=True)
