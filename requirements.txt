@@ -1,7 +1,7 @@
 altair==4.0.1
 attrs==19.3.0
 backcall==0.1.0
-bleach==3.1.1
+bleach==3.1.4
 bokeh==1.4.0
 certifi==2019.11.28
 cffi==1.14.0
@@ -106,3 +106,7 @@ win-inet-pton==1.1.0
 wincertstore==0.2
 zict==2.0.0
 zipp==3.1.0
+PyQt5==5.14.1
+PyQt5-sip==12.7.1
+PyQtWebEngine==5.14.0
+
