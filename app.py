@@ -6,5 +6,6 @@ if __name__ == '__main__':
     # run file like so
     app = heroku_dash_example.run_me()
     # example_dash.heroku_call()
-
+    
+    server = app.server
     app.run_server(debug=True)

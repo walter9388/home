@@ -28,8 +28,9 @@ class football_match():
         self.get_fixture_details(text[1])
         print(self.match_data['season'] + ' ' + self.match_data['competition'] + ': ' + self.match_data['home_team'] + ' vs ' + self.match_data['away_team'])
         if len(re.split(r'([0-9]:[0-9])', text[7]))>1: #handle games which haven't taken place yet
-            self.match_data['kickoff_dt'] = datetime.datetime.strptime(re.split(r', (.*?) Clock', text[4])[1], '%d. %B %Y%H:%M')
-            self.match_data['kickoff_str'] = self.match_data['kickoff_dt'].strftime('%d/%m/%Y %H:%M')
+            if len(re.split(r', (.*?) Clock', text[4]))>1:
+                self.match_data['kickoff_dt'] = datetime.datetime.strptime(re.split(r', (.*?) Clock', text[4])[1], '%d. %B %Y%H:%M')
+                self.match_data['kickoff_str'] = self.match_data['kickoff_dt'].strftime('%d/%m/%Y %H:%M')
             self.get_goals_details(text)
             if not hasattr(self, 'no_lineup'):
                 self.get_lineups(text)
