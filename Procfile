@@ -1,1 +1,1 @@
-web: gunicorn run:server
+web: panel serve --address="0.0.0.0" --port=$PORT run.py --allow-websocket-origin=waldron-imperial.herokuapp.com

@@ -55,20 +55,6 @@ def modify_doc(doc):
     doc.add_root(sea.panel().get_root(doc))
 
 
-@app.route('/')
-def homepage():
-
-    #Get the data, from somewhere
-    df = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data',
-                     names=['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'class'])
-
-    #Setup plot
-    p = get_plot(df)
-    script, div = components(p)
-
-    #Render the page
-    return render_template('home.html', script=script, div=div)
-
 @app.route('/', methods=['GET'])
 def bkapp_page():
     script = server_document('http://localhost:5006/bkapp')
