@@ -20,7 +20,7 @@ server = app # if bokeh/panel
 # pn = example_panel.heruko_call()
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
     # qtwidge.run_dash(app)
     # app.run_server(debug=True)
 
