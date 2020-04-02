@@ -47,12 +47,12 @@ chart = alt.Chart(cars).mark_circle(size=60).encode(
 altair_pane = pn.panel(chart)
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # qtwidge.run_dash(app)
     # app.run_server(debug=True)
 
     # app.run()
-    altair_pane.servable()
+altair_pane.servable()
     # app.debug = True
     # def run_bokeh(app):
     #     app.run(port=8000)
