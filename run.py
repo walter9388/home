@@ -1,6 +1,7 @@
 # import app from wherever
 from heroku import heroku_dash_example
 from plotting_stuff import example_dash, example_panel, example_bokehflask
+from heroku.solver_comparison import panel_app
 
 # for running flash
 # from plotting_stuff import qtwidge
@@ -20,12 +21,13 @@ from plotting_stuff import example_dash, example_panel, example_bokehflask
 
 # pn = example_panel.heruko_call()
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
     # qtwidge.run_dash(app)
     # app.run_server(debug=True)
 
-pan = example_panel.heruko_call()
-pan.servable()
+    # pan = example_panel.heruko_call()
+    pan = panel_app.call_heroku()
+    pan.servable()
     # app.run()
     # app.debug = True
     # def run_bokeh(app):
