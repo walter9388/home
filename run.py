@@ -21,13 +21,13 @@ from heroku.solver_comparison import panel_app
 
 # pn = example_panel.heruko_call()
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # qtwidge.run_dash(app)
     # app.run_server(debug=True)
 
     # pan = example_panel.heruko_call()
-    pan = panel_app.call_heroku()
-    pan.servable()
+pan = panel_app.call_heroku()
+pan.servable()
     # app.run()
     # app.debug = True
     # def run_bokeh(app):
