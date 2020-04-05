@@ -4,7 +4,18 @@ import numpy as np
 import param
 import os
 
-import altair as alt
+# import altair as alt
+
+import seaborn as sns
+
+import matplotlib as mpl
+from bokeh.plotting import output_file, show
+
+tips = sns.load_dataset("tips")
+
+sns.set_style("whitegrid")
+
+
 
 
 css = '''
@@ -15,18 +26,18 @@ css = '''
 }
 '''
 
-pn.extension(raw_css=[css])
+pn.extension('plotly','vega',raw_css=[css])
 
 try:
     # data=pd.read_csv('data.csv',index_col=(0,1,2,3,4))
-    df2=pd.read_csv('data2.csv',header=[0,1,2],index_col=0)
-    df3=pd.read_csv('data3.csv',header=[0,1,2],index_col=0)
+    df2=pd.read_csv('data2.csv',header=[0,1,2,3],index_col=0)
+    df3=pd.read_csv('data3.csv',header=[0,1,2,3],index_col=0)
 except:
     # data=pd.read_csv('data.csv',index_col=(0,1,2,3,4))
-    df2=pd.read_csv('heroku/solver_comparison/data2.csv',header=[0,1,2],index_col=0)
-    df3=pd.read_csv('heroku/solver_comparison/data3.csv',header=[0,1,2],index_col=0)
+    df2=pd.read_csv('heroku/solver_comparison/data2.csv',header=[0,1,2,3],index_col=0)
+    df3=pd.read_csv('heroku/solver_comparison/data3.csv',header=[0,1,2,3],index_col=0)
 
-
+solvers=['L-BFGS-B','SCP']
 
 import numpy as np
 
@@ -36,142 +47,207 @@ from bokeh.models import ColumnDataSource, Slider, TextInput
 from bokeh.plotting import figure
 
 
-checkbox1 = pn.widgets.Checkbox(name='Checkbox',value=True)
+# checkbox1 = pn.widgets.Checkbox(name='L-BFGS-B',value=True)
+# checkbox2 = pn.widgets.Checkbox(name='SCP',value=True)
+checkbox1 = pn.widgets.CheckBoxGroup(
+    name='Checkbox Group', value=['L-BFGS-B', 'SCP'], options=['L-BFGS-B', 'SCP'],
+    inline=True)
+checkbox2 = pn.widgets.CheckBoxGroup(
+    name='Checkbox Group', value=['with reg', 'no reg'], options=['with reg', 'no reg'],
+    inline=True)
 
 headloss_button = pn.widgets.RadioButtonGroup(
+    value=list(df2.columns.levels[2])[0],
+    options=list(df2.columns.levels[2]),
+    button_type='default')
+
+dma_button = pn.widgets.RadioButtonGroup(
     value=list(df2.columns.levels[1])[0],
     options=list(df2.columns.levels[1]),
     button_type='default')
 
-dma_button = pn.widgets.RadioButtonGroup(
-    value=list(df2.columns.levels[0])[0],
-    options=list(df2.columns.levels[0]),
-    button_type='default')
-
 grouping_button = pn.widgets.RadioButtonGroup(
-    value=list(df2.columns.levels[2])[-1],
-    options=list(df2.columns.levels[2])[::-1],
+    name='asdf',
+    value=list(df2.columns.levels[3])[-1],
+    options=list(df2.columns.levels[3])[::-1],
     button_type='default')
 
-@pn.depends(dma_button,headloss_button,grouping_button,checkbox1)
-def bokeh_pane(dma,headloss,grouping,checkbox1):
-
-    x = df2[(dma,headloss,grouping)]
-    y = np.linspace(0,100,len(x))
-
-    x2 = df3[(dma,headloss,grouping)]
-    y2 = np.linspace(0,100,len(x2))
+@pn.depends(dma_button,headloss_button,grouping_button,checkbox1,checkbox2)
+def bokeh_pane(dma,headloss,grouping,checkbox1,checkbox2):
+    x, y, x_0, y_0 = [0,0], [0,0], [0,0], [0,0]
+    for i in range(len(solvers)):
+        x[i] = df2[(solvers[i].replace('-',''), dma, headloss, grouping)]
+        y[i] = np.linspace(0, 100, len(x[i]))
+        x_0[i] = df3[(solvers[i].replace('-',''), dma, headloss, grouping)]
+        y_0[i] = np.linspace(0, 100, len(x_0[i]))
 
 
     # Set up plot
-    p = figure(title='Randomised Starting Points - CDF: BWFL - {} - {} - {}'.format(dma,headloss,grouping),
+    p = figure(title='Randomised Starting Points CDF: BWFL - {} - {} - {}'.format(dma,headloss,grouping),
                tools="reset,save,xwheel_zoom,xpan,hover",
                active_scroll='xwheel_zoom',
                y_range=(0, 100),
                x_axis_label='Validation Error',
                y_axis_label='% tests',
                )
-
     # line 1
-    if checkbox1:
-        p.line(x,y,line_width=3, line_alpha=0.6,color="green",legend_label='L-BFGS-B',name='L-BFGS-B')
+    colours=['green','red']
+    for i in range(len(solvers)):
+        if solvers[i] in checkbox1:
+            if 'with reg' in checkbox2:
+                p.line(x[i], y[i], line_width=3, line_alpha=0.6, color=colours[i], legend_label=solvers[i], name=solvers[i])
+            if 'no reg' in checkbox2:
+                p.line(x_0[i], y_0[i], line_width=3, line_alpha=0.6, line_dash='dashed', color=colours[i], legend_label=solvers[i] + ' (no reg)', name=solvers[i] + ' (no reg)')
 
-    # line 2
-    p.line(x2,y2,line_width=3, line_alpha=0.6,color="red",legend_label='SCP',name='SCP')
 
     # legend
     p.legend.title = 'Solver'
-    p.legend.location = 'top_left'
+    p.legend.location = 'bottom_right'
 
-    p.hover.mode='vline'
+    # p.hover.mode='vline'
     p.hover.tooltips=[
         ('Solver', '$name'),
         ('% of tests', '$y'),
         ('ψ(val)','$x'),
     ]
-    # HoverTool(
-    #     tooltips=[
-    #         ('date', '@date{%F}'),
-    #         ('close', '$@{adj close}{%0.2f}'),  # use @{ } for field names with spaces
-    #         ('volume', '@volume{0.00 a}'),
-    #     ],
-    #
-    #     formatters={
-    #         '@date': 'datetime',  # use 'datetime' formatter for '@date' field
-    #         '@{adj close}': 'printf',  # use 'printf' formatter for '@{adj close}' field
-    #         # use default 'numeral' formatter for other fields
-    #     },
-    #
-    #     # display a tooltip whenever the cursor is vertically in line with a glyph
-    #     mode='vline'
-    # )
 
+    p.outline_line_color = 'black'
 
-    return pn.pane.Bokeh(p, width_policy='max', height_policy='max')
+    return pn.pane.Bokeh(p,sizing_mode='stretch_both',width_policy='max')
 
-# Set up widgets
-# text = TextInput(title="title", value='my sine wave')
-# offset = Slider(title="offset", value=0.0, start=-5.0, end=5.0, step=0.1)
-# amplitude = Slider(title="amplitude", value=1.0, start=-5.0, end=5.0, step=0.1)
-# phase = Slider(title="phase", value=0.0, start=0.0, end=2*np.pi)
-# freq = Slider(title="frequency", value=1.0, start=0.1, end=5.1, step=0.1)
+import plotly.graph_objects as go
 
+@pn.depends(dma_button,headloss_button,grouping_button,checkbox1,checkbox2)
+def plotly_violin(dma,headloss,grouping,checkbox1,checkbox2):
 
-# p.axis.axis_label=None
-# p.axis.visible=False
-# p.grid.grid_line_color = None
+    df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/violin_data.csv")
 
+    fig = go.Figure()
 
-# buttons!!
-from bokeh.models import RadioButtonGroup
+    fig.add_trace(go.Violin(x=df['day'][df['smoker'] == 'Yes'],
+                            y=df['total_bill'][df['smoker'] == 'Yes'],
+                            legendgroup='Yes', scalegroup='Yes', name='Yes',
+                            side='negative',
+                            line_color='blue')
+                  )
+    fig.add_trace(go.Violin(x=df['day'][df['smoker'] == 'No'],
+                            y=df['total_bill'][df['smoker'] == 'No'],
+                            legendgroup='No', scalegroup='No', name='No',
+                            side='positive',
+                            line_color='orange')
+                  )
+    fig.update_traces(meanline_visible=True)
+    fig.update_layout(violingap=0, violinmode='overlay',margin=dict(l=0, r=0, t=0, b=0))
+
+    return pn.pane.Plotly(fig,sizing_mode='stretch_both',width_policy='max')
 
 
 
 
-def Headloss_cb(new):
-    print(new)
-    y = df2[('DMA1',list(df2.columns.levels[1])[new],'nongrouped')]
-    source.data = dict(x=x, y=y)
-
-def DMA_cb(new):
-    y = df2[('DMA1',list(df2.columns.levels[1])[new],'nongrouped')]
-    source.data = dict(x=x, y=y)
-
-def Grouping_cb(new):
-    y = df2[('DMA1',list(df2.columns.levels[1])[new],'nongrouped')]
-    source.data = dict(x=x, y=y)
-
-
-
-
+# import altair as alt
+# from vega_datasets import data
+#
+# cars = data.cars()
+#
+# chart = alt.Chart(cars).mark_circle(size=60).encode(
+#     x='Horsepower',
+#     y='Miles_per_Gallon',
+#     color='Origin',
+#     tooltip=['Name', 'Origin', 'Horsepower', 'Miles_per_Gallon']
+# ).properties(width='container', height='container').interactive()
+#
+# def tem():
+#     return pn.pane.Vega(chart,sizing_mode='stretch_both',width_policy='max')
 
 
+# plot_buttons=pn.Column(pn.widgets.Button(name='Run', margin=0),
+# pn.widgets.Button(name='Run2', margin=0), background='#f0f0f0')
 
 
+cb_group1 = pn.widgets.CheckButtonGroup(name='Check Button Group', value=['Apple'], options=['Apple', 'Banana'],margin=0)
+cb_group2 = pn.widgets.CheckButtonGroup(name='Check Button Group', value=[], options=['Apple', 'Banana'],margin=0)
+plot_buttons=pn.Column(
+    cb_group1,
+    cb_group2
+)
 # dd=pn.pane.Bokeh(headloss_button)
 
 
 # radio_button_group.js_link(p.x,value=df2[('DMA1','DW','nongrouped')])
 
+@pn.depends(cb_group1,cb_group2)
+def gridspec(cb_group1,cb_group2):
+    x=list(cb_group1)+list(cb_group2)
+    print(x)
+    # gspec = pn.GridSpec(height_policy='max',sizing_mode='stretch_both')
+    # if 'Banana' in x:
+    #     gspec = tem
+    # elif 'Apple' in x:
+    #     gspec = plotly_violin
+    # else:
+    gspec = bokeh_pane
+    return gspec
+
+
+# gspec = pn.GridSpec(sizing_mode='stretch_both',width_policy='max')
+#
+# gspec[0, :3] = pn.Spacer(background='#FF0000')
+# gspec[1:3, 0] = pn.Spacer(background='#0000FF')
+# gspec[1:3, 1:3] = plotly_violin
+
+# @pn.depends(select)
+# def download_image(filetype):
+#     print(filetype)
+#
+#
+# fd = pn.widgets.FileDownload(
+#     callback=download_image, filename='filtered_autompg.csv'
+# )
+# select = pn.widgets.Select(options=['.png', '.jpg', '.pdf'], width=100)
 
 
 
-pane=pn.Row(
-    # pn.Column(
-    #     pn.widgets.FloatSlider(name='Number', margin=(10, 5, 5, 10)),
-    #     pn.widgets.Select(name='Fruit', options=['Apple', 'Orange', 'Pear'], margin=(0, 5, 5, 10)),
-    #     pn.widgets.Button(name='Run', margin=(5, 10, 10, 10)),
-    # css_classes=['widget-box']),
-    pn.Column(
-        dma_button,
-        headloss_button,
-        grouping_button,
-        checkbox1,
+
+# button = pn.widgets.Button(name='Download Current Plot/s', button_type='primary',width=200)
+# button.on_click(download_image)
+
+
+pane1=pn.Column(
+    pn.Row(
+        # pn.Column(
+        #     pn.widgets.FloatSlider(name='Number', margin=(10, 5, 5, 10)),
+        #     pn.widgets.Select(name='Fruit', options=['Apple', 'Orange', 'Pear'], margin=(0, 5, 5, 10)),
+        #     pn.widgets.Button(name='Run', margin=(5, 10, 10, 10)),
+        # css_classes=['widget-box']),
+        pn.Column(
+            pn.pane.HTML('<p><b>DMA:</b></p>'),
+            dma_button,
+            pn.pane.HTML('<p><b>Headloss:</b></p>'),
+            headloss_button,
+            pn.pane.HTML('<p><b>Grouping:</b></p>'),
+            grouping_button,
+            pn.pane.HTML('<p><b>Plotting Options:</b></p>'),
+            checkbox1,
+            checkbox2,
+            # plot_buttons,
+            # pn.pane.HTML('<p><b>Download Image:</b></p>'),
+            # pn.Row(button, select),
+        ),
+    bokeh_pane,
+    #     pn.Tabs(
+    #         ('CDF',bokeh_pane),
+    #         ('hist',gspec),
+    #         dynamic=True)
     ),
-    bokeh_pane
+    # pn.pane.HTML('<p>Made by Alex Waldron<br><b>Last updated:</b> 03 April 2020</p>'),
+    width_policy='max',sizing_mode='stretch_both'
 )
 
-# pane.show()
+
+
+
+# html_pane = pn.pane.HTML('hello world')
+
 
 
 # # Dynamic Tabs
@@ -185,6 +261,9 @@ pane=pn.Row(
 #     dynamic=True
 # )
 
-mypanel=pane
+mypanel=pane1
 def call_heroku():
     return mypanel
+
+if __name__=='__main__':
+    mypanel.show()
