@@ -631,12 +631,7 @@ pane1=pn.Column(
     width_policy='max',sizing_mode='stretch_both'
 )
 
-
-
-
 # html_pane = pn.pane.HTML('hello world')
-
-
 
 # # Dynamic Tabs
 # mypanel=pn.Tabs(
