@@ -348,7 +348,10 @@ def splir_bar(dma,headloss,grouping,cb1,cb2,rn,pv,sc):
     checkbox2.disabled=True
     show_c0.disabled = False
 
-    max_init_view=10
+    if inv_map[pv] in ['err_val', 'err_train']:
+        max_init_view = 10
+    else:
+        max_init_view = 1e100  # inf
 
     x=[[],[]]
     if rn == 'using regularisation':
